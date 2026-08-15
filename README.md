@@ -57,12 +57,13 @@ OpenAI 兼容协议（`https://dashscope.aliyuncs.com/compatible-mode/v1`），
 
 ## 模型目录（默认 17 个）
 
-Qwen3 全家 + 网关提供的第三方模型，选择器里直接可选：
+Qwen3 全家 + 网关提供的第三方模型，选择器里直接可选（上下文窗口按官方规格标注）：
 
-- Qwen：`qwen3.8-max`、`qwen3.7-max`、`qwen3.7-flash`、`qwen3.6-plus`、`qwen3.6-flash`、
-  `qwen3-coder-plus`、`qwen3-coder-flash`、`qwen3-vl-plus`（图）、`qwen3-vl-flash`（图）
-- 第三方（经千问网关）：`deepseek-v4-flash`（预览版）、`deepseek-v4-flash-0731`（正式版）、
-  `deepseek-v4-pro`（预览版）、`deepseek-v4-pro-0813`（正式版）、`deepseek-v3.2`、`glm-5.2`、
+- Qwen（1M 上下文）：`qwen3.8-max`、`qwen3.7-max`、`qwen3.7-flash`、`qwen3.6-plus`、`qwen3.6-flash`
+- Qwen（256K 上下文）：`qwen3-coder-plus`、`qwen3-coder-flash`、`qwen3-vl-plus`（图）、`qwen3-vl-flash`（图）
+- 第三方（经千问网关）：`deepseek-v4-flash`（预览版，1M）、`deepseek-v4-flash-0731`（正式版，1M）、
+  `deepseek-v4-pro`（预览版，1M）、`deepseek-v4-pro-0813`（正式版，1M）、`deepseek-v3.2`（128K）、
+  `glm-5.2`、`glm-5.2-fast-preview`、`glm-5.1`（均为 128K）、`kimi-k2.7-code`（256K）
 
 网关共提供 238 个模型 id，想用目录外的：在 `settings.yaml` 加 `llm-qwen:` 段：
 
@@ -84,7 +85,7 @@ llm-qwen:
 | `thinking` | `enabled` | 是否默认启用思考 |
 | `reasoningEffort` | `high` | `off` / `high` / `max` |
 | `maxTokens` | `16384` | 默认输出上限 |
-| `defaultContextWindow` | `131072` | 默认上下文窗口 |
+| `defaultContextWindow` | `131072` | 未在目录中列出的模型的默认上下文窗口 |
 | `models` | 见 `DEFAULT_MODELS` | 模型目录（id/name/contextWindow/maxTokens/inputModalities） |
 | `streamIdleTimeoutMs` | `300000` | 流空闲超时 |
 | `retryPolicy` | 标准重试 | 见 `@deepseek-ai/dsh-llm` |

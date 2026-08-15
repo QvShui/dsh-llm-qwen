@@ -235,7 +235,7 @@ console.log(`\n=== dsh-llm-qwen e2e (model ${model}) ===`);
 {
   console.log("\n[7] model metadata");
   const info = await adapter.resolveModel("qwen", "qwen3.7-flash");
-  check("resolveModel context", info.context?.contextWindow === 131072, JSON.stringify(info.context));
+  check("resolveModel context", info.context?.contextWindow === 1048576, JSON.stringify(info.context));
   check("resolveModel reasoning default", info.reasoning?.defaultEffort === "high", JSON.stringify(info.reasoning));
   const vl = await adapter.resolveModel("qwen", "qwen3-vl-flash");
   check("vl input modalities", JSON.stringify(vl.inputModalities) === JSON.stringify(["text", "image"]), JSON.stringify(vl.inputModalities));
