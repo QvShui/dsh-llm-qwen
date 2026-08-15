@@ -62,7 +62,7 @@ Qwen3 全家 + 网关提供的第三方模型，选择器里直接可选：
 - Qwen：`qwen3.8-max`、`qwen3.7-max`、`qwen3.7-flash`、`qwen3.6-plus`、`qwen3.6-flash`、
   `qwen3-coder-plus`、`qwen3-coder-flash`、`qwen3-vl-plus`（图）、`qwen3-vl-flash`（图）
 - 第三方（经千问网关）：`deepseek-v4-flash`（预览版）、`deepseek-v4-flash-0731`（正式版）、
-  `deepseek-v4-pro`、`deepseek-v3.2`、`glm-5.2`、`glm-5.2-fast-preview`、`glm-5.1`、`kimi-k2.7-code`
+  `deepseek-v4-pro`（预览版）、`deepseek-v4-pro-0813`（正式版）、`deepseek-v3.2`、`glm-5.2`、
 
 网关共提供 238 个模型 id，想用目录外的：在 `settings.yaml` 加 `llm-qwen:` 段：
 
