@@ -10,8 +10,9 @@ OpenAI 兼容协议（`https://dashscope.aliyuncs.com/compatible-mode/v1`），
 ## 能力
 
 - 流式对话（`stream_options.include_usage`，token 用量上报）
-- Qwen3 思考模式：`enable_thinking`，思考内容经 `delta.reasoning_content` 流入
-  harness 的 reasoning 块（off/on 两种 reasoning effort）
+- Qwen3 思考模式：`enable_thinking` + `reasoning_effort`（off/high/max 三档，
+  网关还支持 low/medium），思考内容经 `delta.reasoning_content` 流入 harness 的
+  reasoning 块
 - 工具调用（`delta.tool_calls` + `finish_reason: tool_calls`，含多轮工具结果回传）
 - 图片输入（qwen3-vl 系列：user 内容转 `image_url` data-URL，经 attachments 服务读取）
 - 错误映射：401/403→`AUTH`、429→`RATE_LIMIT`、余额不足→`QUOTA`、
@@ -33,7 +34,7 @@ OpenAI 兼容协议（`https://dashscope.aliyuncs.com/compatible-mode/v1`），
       config:
         baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1'
         thinking: enabled
-        reasoningEffort: on
+        reasoningEffort: high
 ```
 
 3. 重启 `dsh web`。重启后 设置→模型 里出现 **Qwen (DashScope)** 提供商。
@@ -81,7 +82,7 @@ llm-qwen:
 | `apiKeyEnv` | `DASHSCOPE_API_KEY` | 凭证引用名（Models 页填的 key 就存这里） |
 | `baseURL` | `https://dashscope.aliyuncs.com/compatible-mode/v1` | 兼容模式端点 |
 | `thinking` | `enabled` | 是否默认启用思考 |
-| `reasoningEffort` | `on` | `off` / `on` |
+| `reasoningEffort` | `high` | `off` / `high` / `max` |
 | `maxTokens` | `16384` | 默认输出上限 |
 | `defaultContextWindow` | `131072` | 默认上下文窗口 |
 | `models` | 见 `DEFAULT_MODELS` | 模型目录（id/name/contextWindow/maxTokens/inputModalities） |

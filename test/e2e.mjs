@@ -29,7 +29,7 @@ const connection = resolveAdapterOptions({
   apiKeyEnv: "QWEN_DASHSCOPE_API_KEY",
   baseURL: BASE_URL,
   thinking: "enabled",
-  reasoningEffort: "on",
+  reasoningEffort: "high",
   maxTokens: 2048,
   defaultContextWindow: 131072,
   models: DEFAULT_MODELS,
@@ -134,7 +134,7 @@ console.log(`\n=== dsh-llm-qwen e2e (model ${model}) ===`);
   const { message, finish } = await runStream(adapter, {
     provider: "qwen", model,
     messages: [{ role: "user", content: [{ type: "text", text: "9*7等于几？只回答数字" }] }],
-    reasoningEffort: "on",
+    reasoningEffort: "high",
   });
   const r = reasoning(message.content);
   const t = text(message.content);
@@ -236,11 +236,11 @@ console.log(`\n=== dsh-llm-qwen e2e (model ${model}) ===`);
   console.log("\n[7] model metadata");
   const info = await adapter.resolveModel("qwen", "qwen3.7-flash");
   check("resolveModel context", info.context?.contextWindow === 131072, JSON.stringify(info.context));
-  check("resolveModel reasoning default", info.reasoning?.defaultEffort === "on", JSON.stringify(info.reasoning));
+  check("resolveModel reasoning default", info.reasoning?.defaultEffort === "high", JSON.stringify(info.reasoning));
   const vl = await adapter.resolveModel("qwen", "qwen3-vl-flash");
   check("vl input modalities", JSON.stringify(vl.inputModalities) === JSON.stringify(["text", "image"]), JSON.stringify(vl.inputModalities));
   const generic = await adapter.resolveModel("qwen", "some-unlisted-model");
-  check("unlisted model falls back", generic.name === "some-unlisted-model" && generic.reasoning?.defaultEffort === "on");
+  check("unlisted model falls back", generic.name === "some-unlisted-model" && generic.reasoning?.defaultEffort === "high");
   const listed = await adapter.listModels("qwen");
   check("listModels", listed.length === DEFAULT_MODELS.length && listed[0].provider === "qwen", `${listed.length} models`);
   const thirdParty = listed.filter((m) => m.id.startsWith("deepseek-") || m.id.startsWith("glm-"));
@@ -257,7 +257,7 @@ console.log(`\n=== dsh-llm-qwen e2e (model ${model}) ===`);
     apiKeyEnv: "DASHSCOPE_API_KEY",
     baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
     thinking: "enabled",
-    reasoningEffort: "on",
+    reasoningEffort: "high",
   });
   check("schema accepts row config", normalized.issues === undefined, normalized.issues ? JSON.stringify(normalized.issues[0]) : "ok");
   const conn = resolveAdapterOptions(normalized.value, { get: () => undefined });
@@ -283,7 +283,7 @@ console.log(`\n=== dsh-llm-qwen e2e (model ${model}) ===`);
   const { message, finish } = await runStream(adapter, {
     provider: "qwen", model: tpModel,
     messages: [{ role: "user", content: [{ type: "text", text: "1+1等于几？只回答数字" }] }],
-    reasoningEffort: "on",
+    reasoningEffort: "high",
   });
   const t = text(message.content);
   check("emits text", t.length > 0, JSON.stringify(t.slice(0, 40)));
