@@ -1,0 +1,24 @@
+{
+  "name": "dsh-llm-qwen",
+  "version": "0.1.0",
+  "description": "Qwen (DashScope compatible-mode) LLM adapter plugin for DeepSeek Harness, with a settings-page API-key editor",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "inject": [],
+      "immediately": false
+    }
+  },
+  "files": [
+    "lib",
+    "README.md"
+  ],
+  "license": "MIT"
+}
