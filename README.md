@@ -14,7 +14,10 @@ OpenAI 兼容协议（`https://dashscope.aliyuncs.com/compatible-mode/v1`），
   网关还支持 low/medium），思考内容经 `delta.reasoning_content` 流入 harness 的
   reasoning 块
 - 工具调用（`delta.tool_calls` + `finish_reason: tool_calls`，含多轮工具结果回传）
-- 图片输入（qwen3-vl 系列：user 内容转 `image_url` data-URL，经 attachments 服务读取）
+- 图片输入（qwen3.5+/3.6/3.7/3.8 与 qwen3-vl 系列原生支持；user 内容转 `image_url` data-URL，经 attachments 服务读取）
+- **图片任务自动路由**：所选模型不支持图片（如 DeepSeek/GLM/Kimi）时，带图请求自动改由
+  配置的多模态模型处理（默认 `qwen3.8-max`，可在设置页或 `llm-qwen:` settings 段修改，
+  留空关闭）；前端模型名不变，仅 wire 层换模型
 - 错误映射：401/403→`AUTH`、429→`RATE_LIMIT`、余额不足→`QUOTA`、
   上下文超限→`CONTEXT_WINDOW_EXCEEDED`、5xx→`SERVER`
 - 流空闲看门狗、LLM 重试策略（`llm/stream` waterfall 兼容）
@@ -87,6 +90,7 @@ llm-qwen:
 | `maxTokens` | `16384` | 默认输出上限 |
 | `defaultContextWindow` | `131072` | 未在目录中列出的模型的默认上下文窗口 |
 | `models` | 见 `DEFAULT_MODELS` | 模型目录（id/name/contextWindow/maxTokens/inputModalities） |
+| `multiModalFallbackModel` | `qwen3.8-max` | 图片任务的自动路由目标；留空（`""`）关闭 |
 | `streamIdleTimeoutMs` | `300000` | 流空闲超时 |
 | `retryPolicy` | 标准重试 | 见 `@deepseek-ai/dsh-llm` |
 

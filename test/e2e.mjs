@@ -46,9 +46,10 @@ const adapter = new QwenAdapter({
   },
 });
 
-// 32x32 red PNG (VL models reject images smaller than 10px on a side)
+// 64x64 red PNG (VL models reject images smaller than 10px on a side; larger
+// images are also read more reliably by the multimodal fallback route).
 function png32() {
-  const w = 32, h = 32;
+  const w = 64, h = 64;
   const raw = Buffer.alloc((w * 3 + 1) * h);
   for (let y = 0; y < h; y++) {
     raw[y * (w * 3 + 1)] = 0;
@@ -231,6 +232,54 @@ console.log(`\n=== dsh-llm-qwen e2e (model ${model}) ===`);
   check("throws LlmError AUTH", caught?.code === "AUTH", caught ? `${caught.code}: ${caught.message.slice(0, 60)}` : "no throw");
 }
 
+// 6b. Multimodal fallback rerouting
+{
+  console.log("\n[6b] multimodal fallback rerouting");
+  const plain = "deepseek-v4-flash-0731";
+  const withFallback = await adapter.resolveModel("qwen", plain);
+  check(
+    "plain model declares image with fallback on",
+    Array.isArray(withFallback.inputModalities) && withFallback.inputModalities.includes("image"),
+    JSON.stringify(withFallback.inputModalities),
+  );
+  const noFallback = resolveAdapterOptions({
+    apiKeyEnv: "QWEN_DASHSCOPE_API_KEY",
+    baseURL: BASE_URL,
+    thinking: "enabled",
+    reasoningEffort: "high",
+    multiModalFallbackModel: "",
+    models: DEFAULT_MODELS,
+  }, { get: () => undefined });
+  const plainAdapter = new QwenAdapter({
+    options: () => noFallback,
+    resolveApiKey: async () => apiKey(),
+    resolveUserId: () => "e2e-test",
+    resolveImage: async (ref) => {
+      if (ref.mediaType === "image/png") return png32();
+      throw new Error(`unexpected media type ${ref.mediaType}`);
+    },
+  });
+  const withoutFallback = await plainAdapter.resolveModel("qwen", plain);
+  check(
+    "plain model stays text-only with fallback off",
+    Array.isArray(withoutFallback.inputModalities) && !withoutFallback.inputModalities.includes("image"),
+    JSON.stringify(withoutFallback.inputModalities),
+  );
+  // End-to-end: an image request routed through the text-only DeepSeek model
+  // must transparently land on the configured multimodal fallback and succeed.
+  const { message: rerouted, finish: reroutedFinish } = await runStream(adapter, {
+    provider: "qwen", model: plain,
+    messages: [{ role: "user", content: [
+      { type: "text", text: "这张图片是什么颜色？只回答颜色名" },
+      { type: "image", attachment: { attachmentId: "e2e", mediaType: "image/png", bytes: 68, width: 1, height: 1 } },
+    ] }],
+    reasoningEffort: "off",
+  });
+  const rt = text(rerouted.content);
+  check("rerouted image request answers color", /红|red/i.test(rt), JSON.stringify(rt.slice(0, 60)));
+  check("rerouted finish stop", reroutedFinish.kind === "stop", JSON.stringify(reroutedFinish));
+}
+
 // 7. Model metadata
 {
   console.log("\n[7] model metadata");
@@ -273,7 +322,11 @@ console.log(`\n=== dsh-llm-qwen e2e (model ${model}) ===`);
     resolveImage: async () => new Uint8Array(0),
   });
   const info = await adapt.resolveModel("qwen", "qwen3.7-flash");
-  check("normalized adapter resolves model", info.inputModalities === undefined || JSON.stringify(info.inputModalities) === JSON.stringify(["text"]), JSON.stringify(info.inputModalities));
+  check(
+    "normalized adapter resolves model",
+    Array.isArray(info.inputModalities) && info.inputModalities.includes("image"),
+    JSON.stringify(info.inputModalities),
+  );
 }
 
 // 8. Third-party model served through the gateway (deepseek / glm)
